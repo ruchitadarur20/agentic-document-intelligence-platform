@@ -1,0 +1,12 @@
+Acme Incident Response Playbook
+
+Suspected exposure of confidential customer data must be escalated to the security
+incident commander within fifteen minutes. The initial triage record must include the
+affected system, discovered time, suspected data type, and current containment status.
+
+Customer-impacting incidents require legal and compliance review before any external
+notification is sent. Evidence logs, timeline notes, and containment actions must be
+preserved for audit review for six years.
+
+AI-assisted incident briefs must cite the evidence used for every timeline and impact
+statement. Unverified root-cause statements must be labeled as preliminary.

@@ -1,0 +1,12 @@
+Acme Employee Onboarding Policy
+
+New employees must complete identity verification, security awareness training, and
+acceptable-use acknowledgement before receiving production access. Managers must confirm
+role-based access requirements before the access request is approved.
+
+Contractor onboarding requires a sponsor, end date, and quarterly access review. Access
+for contractors must expire automatically on the contract end date unless renewed by the
+sponsor.
+
+AI-generated onboarding answers must cite policy evidence and must not infer employment
+eligibility, background-check results, or access approval without supporting records.

@@ -1,0 +1,12 @@
+Acme Lending Operations Policy
+
+Loan applications must include identity verification, income documentation, and a signed
+borrower consent form before underwriting can begin. Missing income documentation must
+be routed to manual review within one business day.
+
+Approved loan packages must be retained for seven years after account closure. Rejected
+loan applications must be retained for three years after the final decision date.
+
+AI-generated borrower summaries must cite the exact source document chunks used for
+the answer. If the source evidence is incomplete, the summary must clearly state that
+manual review is required before the response is sent to the borrower.

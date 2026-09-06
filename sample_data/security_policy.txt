@@ -1,0 +1,18 @@
+Acme Financial Services Information Security Policy
+
+All customer financial documents must be classified before storage. Documents containing
+account numbers, social security numbers, loan applications, tax forms, or personal
+financial statements are classified as confidential.
+
+Confidential documents must be encrypted at rest and in transit. Access is limited to
+authorized employees with a documented business purpose. Every document access event
+must be logged with the user identifier, timestamp, document identifier, and action.
+
+The retention period for loan application documents is seven years after account closure.
+Documents under litigation hold must not be deleted until the legal department removes
+the hold. Quarterly audits must verify retention controls and access control evidence.
+
+AI-generated summaries must cite the source document chunks used to produce each answer.
+Unsupported claims must be flagged for human review before the answer is sent to a
+customer or regulator.
+
