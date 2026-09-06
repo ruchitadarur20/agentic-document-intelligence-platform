@@ -26,6 +26,10 @@ regulated document use cases.
   readiness, citations, and traces.
 - Prometheus and Grafana monitoring for API and agent metrics.
 - Docker Compose setup for local end-to-end execution.
+- LangGraph primary orchestration with an optional CrewAI-compatible adapter.
+- PySpark/Databricks Delta Lake job for document quality and analytics tables.
+- Azure Container Apps deployment template and Azure production architecture notes.
+- LLMOps versioning for prompt, model, retrieval config, and traceable run metadata.
 
 ## Live Demo
 
@@ -150,6 +154,77 @@ FastAPI Application
 6. Evaluation Agent scores relevance, faithfulness, completeness, latency, and token use.
 7. Trace storage records the plan, evidence, answer, validation, and evaluation.
 
+## LangGraph And CrewAI
+
+The main workflow follows a LangGraph-compatible `StateGraph` design with planner,
+retrieval, ranking, response, validation, and evaluation nodes.
+
+The repository also includes an optional CrewAI-compatible adapter at
+`app/agents/crewai_adapter.py`. It maps the same workflow into crew roles:
+
+- Document Intake Analyst
+- Evidence Retrieval Specialist
+- Compliance Reviewer
+
+CrewAI is optional so the local demo can run without extra dependencies. To install the
+optional orchestration package:
+
+```bash
+pip install -e ".[orchestration]"
+```
+
+See `docs/orchestration.md` for details.
+
+## LLMOps Versioning
+
+Every new agent run stores traceable metadata for:
+
+- Prompt versions and prompt fingerprints.
+- Chat model deployment.
+- Embedding model deployment.
+- Azure OpenAI API version.
+- Vector backend.
+- Chunking and retrieval configuration.
+- Metadata filters used for retrieval.
+- LangGraph and CrewAI orchestration metadata.
+
+Open a run trace to inspect this evidence:
+
+```text
+http://127.0.0.1:8000/runs/{run_id}/trace
+```
+
+See `docs/llmops.md` for details.
+
+## Databricks, Spark, And Delta Lake
+
+The project includes a PySpark Delta Lake job at:
+
+```text
+databricks/document_quality_job.py
+```
+
+The job reads raw document records from a Delta bronze table, produces cleaned silver
+document records, and writes gold document quality metrics by classification.
+
+Databricks job configuration is included at:
+
+```text
+databricks/job.yml
+```
+
+## Azure Deployment
+
+Azure deployment artifacts are included under:
+
+```text
+infra/azure/
+```
+
+The included Bicep template targets Azure Container Apps. The production architecture can
+use Azure OpenAI, Azure Container Registry, Azure Database for PostgreSQL, Azure Cache for
+Redis, Cosmos DB MongoDB API, Blob Storage, and Azure Monitor.
+
 ## Tech Stack
 
 - Python 3.12
@@ -159,7 +234,9 @@ FastAPI Application
 - MongoDB
 - Redis
 - LangGraph-compatible agent workflow
+- Optional CrewAI-compatible orchestration adapter
 - Azure OpenAI-compatible LLM and embedding configuration
+- PySpark, Databricks, and Delta Lake analytics job
 - Prometheus
 - Grafana
 - OpenTelemetry
@@ -335,6 +412,9 @@ app/
   schemas/         API contracts
   services/        LLM, vector store, metadata, memory
   workers/         Async worker placeholders
+databricks/
+  document_quality_job.py   PySpark Delta Lake quality job
+  job.yml                   Databricks job configuration
 infra/
   azure/           Azure deployment template
   grafana/         Grafana dashboards and provisioning
@@ -351,10 +431,12 @@ Planned production extensions:
 
 - Replace local file storage with Azure Blob Storage.
 - Use managed PostgreSQL with pgvector or Azure AI Search for large-scale retrieval.
+- Schedule the Databricks Delta job as part of a production data quality pipeline.
 - Move document processing to a queue-backed worker.
 - Add tenant isolation and user-level authorization.
 - Add streaming responses for long-running agent work.
 - Persist audit logs in PostgreSQL instead of in-memory demo storage.
+- Persist prompt/model/config version history in a dedicated LLMOps registry.
 - Send OpenTelemetry traces to Azure Monitor or another OTLP backend.
 - Add CI deployment to Azure Container Apps.
 
@@ -362,4 +444,3 @@ Planned production extensions:
 
 The current version is a complete local demo system with API, storage, sample data,
 agentic retrieval, citations, validation, proof dashboard, report export, and monitoring.
-

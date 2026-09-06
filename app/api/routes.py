@@ -877,6 +877,11 @@ async def dashboard_data(session: AsyncSession = Depends(get_session)) -> dict:
             {"name": "Vector search ready", "ready": any_chunks},
             {"name": "Citations enabled", "ready": any_runs},
             {"name": "Validation enabled", "ready": any_runs},
+            {"name": "LangGraph workflow", "ready": workflow.graph is not None},
+            {"name": "CrewAI adapter", "ready": True},
+            {"name": "LLMOps versioning", "ready": any_runs},
+            {"name": "Databricks Delta job", "ready": Path("databricks/document_quality_job.py").exists()},
+            {"name": "Azure deployment template", "ready": Path("infra/azure/container-app.bicep").exists()},
             {"name": "Grafana connected", "ready": True},
         ],
         "audit_log": AUDIT_LOG[:8],
@@ -990,6 +995,7 @@ async def dashboard_report(session: AsyncSession = Depends(get_session)) -> HTML
             "answer": (run.result or {}).get("answer", ""),
             "citations": (run.result or {}).get("citations", []),
             "validation": (run.result or {}).get("validation", {}),
+            "llmops": (run.result or {}).get("llmops", {}),
             "evaluation": {
                 "relevance": evaluation.relevance,
                 "faithfulness": evaluation.faithfulness,
@@ -1284,6 +1290,7 @@ async def run_trace(run_id: UUID, session: AsyncSession = Depends(get_session)) 
         "trace_id": run.trace_id,
         "plan": run.plan,
         "result": run.result,
+        "llmops": (run.result or {}).get("llmops", {}),
         "evaluation": {
             "relevance": evaluation.relevance,
             "faithfulness": evaluation.faithfulness,

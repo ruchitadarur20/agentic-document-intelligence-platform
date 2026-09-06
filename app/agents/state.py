@@ -16,6 +16,6 @@ class AgentState(TypedDict, total=False):
     citations: list[dict[str, Any]]
     validation: dict[str, Any]
     evaluation: dict[str, Any]
+    llmops: dict[str, Any]
     latency_ms: int
     token_usage: int
-

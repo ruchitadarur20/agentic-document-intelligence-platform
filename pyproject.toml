@@ -52,6 +52,9 @@ dev = [
 data = [
   "pyspark>=3.5.1",
 ]
+orchestration = [
+  "crewai>=0.95.0",
+]
 ocr = [
   "pillow>=10.4.0",
   "pytesseract>=0.3.13",

@@ -4,11 +4,13 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.agents.crewai_adapter import CrewAIWorkflowAdapter
 from app.agents.state import AgentState
 from app.core.config import settings
 from app.models.entities import Conversation, Evaluation, Message, Run
 from app.observability.metrics import AGENT_RUNS
 from app.services.llm import LLMClient
+from app.services.llmops import build_llmops_metadata
 from app.services.memory import ConversationMemory
 from app.services.vector_store import RetrievedChunk, VectorStore
 
@@ -18,6 +20,7 @@ class AgentWorkflow:
         self.llm = LLMClient()
         self.vector_store = VectorStore()
         self.memory = ConversationMemory()
+        self.crewai = CrewAIWorkflowAdapter()
         self.graph = self._compile_graph()
 
     async def run(
@@ -41,6 +44,7 @@ class AgentWorkflow:
             "conversation_id": conversation.id,
             "run_id": run.id,
             "metadata_filters": metadata_filters or {},
+            "llmops": self._run_metadata(metadata_filters or {}),
         }
         try:
             state = await self._execute(session, state)
@@ -53,6 +57,7 @@ class AgentWorkflow:
                 "citations": state.get("citations", []),
                 "validation": state.get("validation", {}),
                 "evaluation": state.get("evaluation", {}),
+                "llmops": state.get("llmops", {}),
             }
             session.add(
                 Message(
@@ -145,9 +150,28 @@ class AgentWorkflow:
                 "metadata_filters": state.get("metadata_filters", {}),
                 "top_k": settings.retrieval_top_k,
             },
+            "orchestration": {
+                "primary_graph": "LangGraph StateGraph",
+                "compiled_graph_available": self.graph is not None,
+                "crew_adapter": self.crewai.crew_spec(),
+            },
             "query_summary": query[:240],
         }
         return state
+
+    def _run_metadata(self, metadata_filters: dict[str, Any]) -> dict[str, Any]:
+        metadata = build_llmops_metadata()
+        metadata["orchestration"] = {
+            "primary_framework": "LangGraph",
+            "primary_graph": "StateGraph",
+            "crew_ai_adapter": self.crewai.crew_spec(),
+        }
+        metadata["retrieval"] = {
+            "metadata_filters": metadata_filters,
+            "top_k": settings.retrieval_top_k,
+            "vector_backend": settings.vector_backend,
+        }
+        return metadata
 
     async def _retrieval(self, session: AsyncSession, state: AgentState) -> AgentState:
         query = state["query"]

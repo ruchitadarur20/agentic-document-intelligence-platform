@@ -1,0 +1,14 @@
+resources:
+  jobs:
+    document_quality_delta_job:
+      name: agentic-document-quality-delta-job
+      tasks:
+        - task_key: build_document_quality_tables
+          spark_python_task:
+            python_file: ./databricks/document_quality_job.py
+          existing_cluster_id: ${var.existing_cluster_id}
+      tags:
+        system: agentic-document-intelligence
+        layer: delta-lake
+        llmops: traceable-quality-metrics
+
